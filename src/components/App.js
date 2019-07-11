@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-
+import axios from 'axios'
 import './App.css';
-
 import Header from './Header/Header';
 import Compose from './Compose/Compose';
+import { ToastContainer, toast } from 'react-toastify'
+import Post from './Post/Post'
 
 class App extends Component {
   constructor() {
@@ -19,11 +20,27 @@ class App extends Component {
   }
   
   componentDidMount() {
+    axios.get(`https://practiceapi.devmountain.com/api/posts`)
+    .then(res=> {
+      this.setState({ posts: res.data });
+      toast.succes(`Hello`)
+    })
+    .catch(()=>{
+      toast.error(`im in trouble`)
+    })
 
   }
 
-  updatePost() {
-  
+  updatePost(id, text ) {
+    console.log(`helloworld`)
+    axios.put(`https://practiceapi.devmountain.com/api/posts?id=${id}`, {text})
+    .then(res=> {
+      toast.success('woot posted')
+      this.setState({ posts: res.data })
+    })
+    .catch(()=> {
+      toast.error(`ah Shit`)
+    })
   }
 
   deletePost() {
@@ -33,7 +50,6 @@ class App extends Component {
   createPost() {
 
   }
-
   render() {
     const { posts } = this.state;
 
@@ -45,6 +61,16 @@ class App extends Component {
 
           <Compose />
           
+          {
+            posts.map( post => (
+              <Post key={ post.id } 
+                    text={ post.text }
+                    date={ post.date } 
+                    id= { post.id }
+                    updatePostfn={ this.updatePost} />
+            ))
+          }
+
         </section>
       </div>
     );
